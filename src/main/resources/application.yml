@@ -1,0 +1,36 @@
+server:
+  port: 8083
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: browse-drink-ui_route
+          uri: http://browse-drink-ui.default.svc.cluster.local:3001
+          predicates:
+            - Path=/browse/**
+          filters:
+            - RewritePath=/browse(?<segment>/?.*), $\{segment}
+        - id: browse-api_route
+          uri: http://browse-drink-api-gateway.default.svc.cluster.local:8081
+          predicates:
+            - Path=/browse/api/**
+        - id: content_route
+          uri: http://content.default.svc.cluster.local:5000
+          predicates:
+            - Path=/content/**
+          filters:
+            - RewritePath=/content(?<segment>/?.*), $\{segment}
+        - id: order-drink-ui_route
+          uri: http://order-drink-ui.default.svc.cluster.local:5000
+          predicates:
+            - Path=/order/**
+          filters:
+            - RewritePath=/order(?<segment>/?.*), $\{segment}
+        - id: order-api_route
+          uri: http://order-drink-api-gateway.default.svc.cluster.local:8082
+          predicates:
+            - Path=/order/api/**
+        - id: drink-container-ui_route
+          uri: http://drink-container-ui.default.svc.cluster.local:3000
+          predicates:
+            - Path=/**
