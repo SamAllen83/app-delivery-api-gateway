@@ -1,36 +1,47 @@
 server:
   port: 8083
+browse:
+  drink:
+    api: http://browse-drink-api-gateway.default.svc.cluster.local:8081
+    ui: http://browse-drink-ui.default.svc.cluster.local:3001
+order:
+  drink:
+    api: http://order-drink-api-gateway.default.svc.cluster.local:8082
+    ui: http://order-drink-ui.default.svc.cluster.local:3002
+content: http://content.default.svc.cluster.local:5000
+container:
+  ui: http://drink-container-ui.default.svc.cluster.local:3000
 spring:
   cloud:
     gateway:
       routes:
+        - id: browse-api_route
+          uri: ${browse.drink.api}
+          predicates:
+            - Path=/browse/api/**
         - id: browse-drink-ui_route
-          uri: http://browse-drink-ui.default.svc.cluster.local:3001
+          uri: ${browse.drink.ui}
           predicates:
             - Path=/browse/**
           filters:
-            - RewritePath=/browse(?<segment>/?.*), $\{segment}
-        - id: browse-api_route
-          uri: http://browse-drink-api-gateway.default.svc.cluster.local:8081
-          predicates:
-            - Path=/browse/api/**
+            - RewritePath=/browse/(?<segment>.*), /$\{segment}
         - id: content_route
-          uri: http://content.default.svc.cluster.local:5000
+          uri: ${content}
           predicates:
             - Path=/content/**
           filters:
-            - RewritePath=/content(?<segment>/?.*), $\{segment}
+            - RewritePath=/content/(?<segment>.*), /$\{segment}
+        - id: order-api_route
+          uri: ${order.drink.api}
+          predicates:
+            - Path=/order/api/**
         - id: order-drink-ui_route
-          uri: http://order-drink-ui.default.svc.cluster.local:5000
+          uri: ${order.drink.ui}
           predicates:
             - Path=/order/**
           filters:
-            - RewritePath=/order(?<segment>/?.*), $\{segment}
-        - id: order-api_route
-          uri: http://order-drink-api-gateway.default.svc.cluster.local:8082
-          predicates:
-            - Path=/order/api/**
+            - RewritePath=/order/(?<segment>.*), /$\{segment}
         - id: drink-container-ui_route
-          uri: http://drink-container-ui.default.svc.cluster.local:3000
+          uri: ${container.ui}
           predicates:
             - Path=/**
